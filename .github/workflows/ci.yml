@@ -16,9 +16,9 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        cabal: ["3.0"]
+        cabal: ["3.6.2.0"]
         ghc:
-          - "9.0.2"
+          - "9.2.5"
 
     steps:
     - uses: actions/checkout@v2
@@ -66,9 +66,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        stack: ["2.7.3"]
+        stack: ["2.9.1"]
         ghc:
-          - "9.0.2"
+          - "9.2.5"
 
     steps:
     - uses: actions/checkout@v2
