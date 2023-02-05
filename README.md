@@ -7,3 +7,17 @@ A toolkit to better handle goodread books
 
 - Random book pick
 - Shelves reorg
+
+
+### Contributing
+#### Setup
+Prepare a development environment
+```bash
+stack build
+pre-commit install
+```
+#### Running tests
+
+```bash
+stack test
+```
