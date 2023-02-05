@@ -8,8 +8,9 @@ This module contain the domain models
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE RecordWildCards    #-}
 
-module Domain (Book(..), parseBooks, encodeBooks) where
+module Domain (Book(..), parseBooks, encodeBooks, Operation (..), apply) where
 
+import           Data.Bifunctor
 import qualified Data.ByteString      as BS
 import qualified Data.ByteString.Lazy as B
 import           Data.Csv
@@ -17,7 +18,7 @@ import           Data.Foldable        (foldr, toList)
 import qualified Data.Text            as T
 import qualified Data.Vector          as V
 import           Prelude              hiding (lookup)
-
+import           System.Random
 type Author = T.Text
 type ISBN = T.Text
 type Title = T.Text
@@ -45,7 +46,7 @@ instance ToNamedRecord Book where
     , "ISBN13" .= isbn13
     ]
 
-data Operation = Random | List | GroupByCategory
+data Operation = Random | List -- | GroupByCategory
 
 parseBooks :: B.ByteString -> Either String (Header, V.Vector Book)
 parseBooks = decodeByName
@@ -57,5 +58,14 @@ encodeBooks = encodeByNameWith encodeOptions (V.fromList supportedField) . toLis
 
 -- Below, there is the business logic which could be moved away
 
-apply :: Foldable f => f Book -> Operation -> f Book
-apply = undefined
+
+randomBook :: (RandomGen g) => g -> V.Vector Book -> (V.Vector Book, g)
+randomBook gen books = first selectPrepare random
+  where
+    random = uniformR (0, length books - 1) gen
+    selectPrepare = V.singleton . (V.!) books
+
+apply :: RandomGen g => g -> Operation -> V.Vector Book -> V.Vector Book
+apply gen Random books  = let (randomBookV, _gen) = randomBook gen books
+                         in randomBookV
+apply _ _ books = books

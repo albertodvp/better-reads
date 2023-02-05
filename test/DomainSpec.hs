@@ -9,8 +9,9 @@ import           Test.QuickCheck.Instances
 import qualified Data.ByteString.Lazy      as B
 import qualified Data.Text                 as T
 import qualified Data.Vector               as V
-import           Domain                    (Book (..), encodeBooks, parseBooks)
-
+import           Domain                    (Book (..), Operation (..), apply,
+                                            encodeBooks, parseBooks)
+import           System.Random
 -- TODO: how can I derive this automagically?
 instance Arbitrary Book where
   arbitrary = do
@@ -18,6 +19,10 @@ instance Arbitrary Book where
     author <- arbitrary
     isbn13 <- arbitrary
     return $ Book {..}
+
+
+stdGen :: StdGen
+stdGen = mkStdGen 42
 
 spec :: Spec
 spec = do
@@ -68,4 +73,22 @@ spec = do
   describe "property based encode/parse" $ do
     prop "parse . encode = id" $
       \books -> let Right (_, encodedParsedBooks) = parseBooks (encodeBooks books) in encodedParsedBooks `shouldBe` books
+
+
+  describe "operations application" $ do
+    it "`List` operation returns the given list" $ do
+      let
+        books = V.fromList [Book "What We Owe the Future" "William MacAskill" "9781541618626"
+                           , Book "Data Mesh: Delivering Data-Driven Value at Scale" "Zhamak Dehghani" "9781492092391"
+                           ]
+        listOfBooks = apply stdGen List books
+      listOfBooks `shouldBe` books
+
+
+    it "`Random` operation returns a list with one single book" $ do
+      let
+        randomBookV = apply stdGen Random (V.fromList [Book "What We Owe the Future" "William MacAskill" "9781541618626"
+                                                         , Book "Data Mesh: Delivering Data-Driven Value at Scale" "Zhamak Dehghani" "9781492092391"
+                                                         ])
+      length randomBookV `shouldBe` 1
 
