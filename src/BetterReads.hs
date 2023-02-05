@@ -5,12 +5,11 @@ Maintainer: Alberto Fanton <alberto.fanton@protonmail.com>
 
 A toolkit to better handle goodread books
 -}
+module BetterReads (
+    projectName,
+) where
 
-module BetterReads
-    ( projectName
-    ) where
-
-import           Data.Text
+import Data.Text
 
 projectName :: Text
 projectName = "better-reads"

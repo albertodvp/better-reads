@@ -1,6 +1,6 @@
 module Main (main) where
 
-import           Test.Hspec
+import Test.Hspec
 
 import qualified DomainSpec
 
@@ -9,4 +9,4 @@ main = hspec spec
 
 spec :: Spec
 spec = do
-  context "Domain" DomainSpec.spec
+    context "Domain" DomainSpec.spec
