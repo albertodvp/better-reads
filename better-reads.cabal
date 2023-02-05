@@ -29,6 +29,7 @@ common common-options
                        , QuickCheck
                        , quickcheck-instances
                        , random
+                       , optparse-applicative
   default-extensions:    OverloadedStrings
                        , RecordWildCards
   ghc-options:         -Wall
@@ -59,9 +60,18 @@ library
   hs-source-dirs:      src
   exposed-modules:       BetterReads
                        , Domain
-executable better-reads
+executable better-reads-cli
   import:              common-options
-  hs-source-dirs:      app
+  hs-source-dirs:      app/cli
+  main-is:             Main.hs
+  build-depends:       better-reads
+  ghc-options:         -threaded
+                       -rtsopts
+                       -with-rtsopts=-N
+                       
+executable better-reads-web
+  import:              common-options
+  hs-source-dirs:      app/web
   main-is:             Main.hs
   build-depends:       better-reads
   ghc-options:         -threaded

@@ -21,6 +21,7 @@ instance Arbitrary Book where
     return $ Book {..}
 
 
+-- TODO: how does this work? Why can I use it in the tests
 stdGen :: StdGen
 stdGen = mkStdGen 42
 
