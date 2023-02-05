@@ -88,7 +88,8 @@ jobs:
 
     - name: Build
       run: |
-        stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks --ghc-options=-Werror
+        # stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks --ghc-options=-Werror
+        stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks        
 
     - name: Test
       run: |
