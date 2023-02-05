@@ -3,7 +3,12 @@ module Main (main) where
 import Data.ByteString.Lazy as BL
 import Data.Foldable (traverse_)
 import Data.Semigroup ((<>))
-import Domain (Operation (..), apply, parseBooks)
+import Domain (
+    Operation (..),
+    apply,
+    encodeBooks,
+    parseBooks,
+ )
 import Options.Applicative
 import System.Random
 
@@ -15,17 +20,22 @@ listO = flag' List (long "list" <> help "Get the same list you passed")
 operation :: Parser Operation
 operation = randomO <|> listO
 
-params :: Parser (FilePath, Operation)
-params = (,) <$> argument str (metavar "INPUT_BOOKS_FILE") <*> operation
+params :: Parser (FilePath, FilePath, Operation)
+params =
+    (,,)
+        <$> argument str (metavar "INPUT_BOOKS_FILE")
+        <*> argument str (metavar "OUTPUT_BOOKS_FILE")
+        <*> operation
 
-opts :: ParserInfo (FilePath, Operation)
+opts :: ParserInfo (FilePath, FilePath, Operation)
 opts = info (params <**> helper) (fullDesc <> progDesc "Do something with you good read books" <> header "BetterReads - A toolkit to better handle goodread books")
 
 main :: IO ()
 main = do
-    (filePath, operation) <- execParser opts
-    csvData <- BL.readFile filePath
+    (inputFilePath, outputFilePath, operation) <- execParser opts
+    csvData <- BL.readFile inputFilePath
     randomGen <- initStdGen
     case parseBooks csvData of
         Left err -> putStrLn err
-        Right (_, books) -> traverse_ print (apply randomGen operation books)
+        Right (_, books) ->
+            BL.writeFile outputFilePath $ encodeBooks (apply randomGen operation books)
