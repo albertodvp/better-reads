@@ -1,10 +1,11 @@
 module Main (main) where
-import           Data.ByteString.Lazy as BL
-import           Data.Foldable        (traverse_)
-import           Data.Semigroup       ((<>))
-import           Domain               (Operation (..), apply, parseBooks)
-import           Options.Applicative
-import           System.Random
+
+import Data.ByteString.Lazy as BL
+import Data.Foldable (traverse_)
+import Data.Semigroup ((<>))
+import Domain (Operation (..), apply, parseBooks)
+import Options.Applicative
+import System.Random
 
 randomO :: Parser Operation
 randomO = flag' Random (long "random" <> help "Get a list with only one random book")
@@ -22,10 +23,9 @@ opts = info (params <**> helper) (fullDesc <> progDesc "Do something with you go
 
 main :: IO ()
 main = do
-  (filePath, operation) <- execParser opts
-  csvData <- BL.readFile filePath
-  randomGen <- initStdGen
-  case parseBooks csvData of
-    Left err         -> putStrLn err
-    Right (_, books) -> traverse_ print (apply randomGen operation books)
-
+    (filePath, operation) <- execParser opts
+    csvData <- BL.readFile filePath
+    randomGen <- initStdGen
+    case parseBooks csvData of
+        Left err -> putStrLn err
+        Right (_, books) -> traverse_ print (apply randomGen operation books)

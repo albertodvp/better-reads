@@ -89,11 +89,11 @@ jobs:
     - name: Build
       run: |
         # stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks --ghc-options=-Werror
-        stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks        
+        stack build --system-ghc --test --bench --no-run-tests --no-run-benchmarks
     - name: Format check
-      run: stack exec fourmolu -- --mode check src test
+      run: stack exec fourmolu -- --mode check src test app
     - name: HLint
-      run: stack exec hlint -- src test
+      run: stack exec hlint -- src test app
     - name: Test
       run: |
         stack test --system-ghc
