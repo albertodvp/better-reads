@@ -8,7 +8,7 @@ This module contain the domain models
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE RecordWildCards    #-}
 
-module Domain (Book(..), parseBooks) where
+module Domain (Book(..), parseBooks, encodeBooks) where
 
 import qualified Data.ByteString      as BS
 import qualified Data.ByteString.Lazy as B
@@ -32,21 +32,28 @@ data Book = Book {
   } deriving stock (Show, Eq)
 
 instance FromNamedRecord Book where
-  --parseNamedRecord r = Book <$> r .: "Title" <*> r .: "Author" <*> r .: "ISBN13"
   parseNamedRecord r = do
     title <- r .: "Title"
     author <- r .: "Author"
     isbn13 <- r .: "ISBN13"
     return $ Book {..}
 
+instance ToNamedRecord Book where
+  toNamedRecord (Book {..}) = namedRecord [
+    "Title" .= title
+    , "Author" .= author
+    , "ISBN13" .= isbn13
+    ]
+
 data Operation = Random | List | GroupByCategory
 
 parseBooks :: B.ByteString -> Either String (Header, V.Vector Book)
 parseBooks = decodeByName
 
--- encodeBook :: Foldable f => f a -> B.ByteString
--- encodeBook = encodeByName (V.fromList supportedField) . toList
-
+encodeBooks :: Foldable f => f Book -> B.ByteString
+encodeBooks = encodeByNameWith encodeOptions (V.fromList supportedField) . toList
+  where
+    encodeOptions = defaultEncodeOptions { encUseCrLf = False }
 
 -- Below, there is the business logic which could be moved away
 
