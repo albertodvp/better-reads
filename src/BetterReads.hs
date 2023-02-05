@@ -10,6 +10,7 @@ module BetterReads
     ( projectName
     ) where
 
+import           Data.Text
 
-projectName :: String
+projectName :: Text
 projectName = "better-reads"

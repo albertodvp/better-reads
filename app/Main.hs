@@ -1,7 +1,6 @@
 module Main (main) where
 
-import BetterReads (projectName)
-
+import           BetterReads (projectName)
 
 main :: IO ()
-main = putStrLn ("Executable for " ++ projectName)
+main = putStrLn "Executable"

@@ -1,7 +1,12 @@
 module Main (main) where
 
-import BetterReads (projectName)
+import           Test.Hspec
 
+import qualified DomainSpec
 
 main :: IO ()
-main = putStrLn ("Tests for " ++ projectName)
+main = hspec spec
+
+spec :: Spec
+spec = do
+  context "Domain" DomainSpec.spec
