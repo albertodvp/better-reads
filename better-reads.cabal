@@ -32,6 +32,11 @@ common common-options
                        , optparse-applicative
                        , fourmolu
                        , hlint
+                       , morpheus-graphql
+                       , servant
+                       , servant-server
+                       , warp
+                       , wai
   default-extensions:    OverloadedStrings
                        , RecordWildCards
   ghc-options:         -Wall
@@ -62,6 +67,8 @@ library
   hs-source-dirs:      src
   exposed-modules:       BetterReads
                        , Domain
+                       , Application
+                       , GraphQLAPI
 executable better-reads-cli
   import:              common-options
   hs-source-dirs:      app/cli

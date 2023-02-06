@@ -28,7 +28,7 @@ supportedField :: [BS.ByteString]
 supportedField = ["Title", "Author", "ISBN13"]
 
 data Book = Book
-    { title :: ISBN -- the title of the book
+    { title :: Title -- the title of the book
     , author :: Author -- the author of the book
     , isbn13 :: ISBN -- 13 digit book identifier that is intended to be unique
     }
