@@ -1,6 +1,7 @@
 module Main (main) where
 
-import BetterReads (projectName)
+import Application (app)
+import Network.Wai.Handler.Warp (run)
 
 main :: IO ()
-main = putStrLn "Executable web"
+main = run 8081 app
