@@ -32,7 +32,6 @@ common common-options
                        , optparse-applicative
                        , fourmolu
                        , hlint
-                       , morpheus-graphql
                        , servant
                        , servant-server
                        , warp
@@ -68,7 +67,7 @@ library
   exposed-modules:       BetterReads
                        , Domain
                        , Application
-                       , GraphQLAPI
+
 executable better-reads-cli
   import:              common-options
   hs-source-dirs:      app/cli
