@@ -67,6 +67,7 @@ randomBook gen books = first selectPrepare random
     random = uniformR (0, length books - 1) gen
     selectPrepare = V.singleton . (V.!) books
 
+-- TODO, this smells
 apply :: RandomGen g => g -> Operation -> V.Vector Book -> V.Vector Book
 apply gen Random books =
     let (randomBookV, _gen) = randomBook gen books
