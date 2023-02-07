@@ -49,7 +49,7 @@ instance ToNamedRecord Book where
             , "ISBN13" .= isbn13
             ]
 
-data Operation = Random | List deriving stock (Show)
+data Operation = Random | List deriving stock (Show, Read)
 
 parseBooks :: B.ByteString -> Either String (Header, V.Vector Book)
 parseBooks = decodeByName
