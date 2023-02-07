@@ -5,13 +5,16 @@ module Application (app) where
 
 import qualified Data.ByteString.Lazy as B
 import Data.Text as T
+import Data.Vector as V
 import Domain (
     Book (..),
     Operation (..),
+    apply,
     encodeBooks,
     parseBooks,
  )
 import Servant
+import System.Random
 import Prelude hiding (ByteString)
 
 data PingMode = Loud | Normal
@@ -52,10 +55,15 @@ handlerPingPong mm =
             Nothing -> "..."
      in pure res
 
+applyOperation :: Operation -> V.Vector Book -> Handler B.ByteString
+applyOperation op books = do
+    gen <- liftIO initStdGen
+    pure $ encodeBooks $ apply gen op books
+
 booksOperationHandler :: Operation -> B.ByteString -> Handler B.ByteString
-booksOperationHandler _ booksBS = case parseBooks booksBS of
+booksOperationHandler op booksBS = case parseBooks booksBS of
     Left err -> throwError $ err400{errBody = "Bad request :("}
-    Right (_, books) -> pure $ encodeBooks books
+    Right (_, books) -> applyOperation op books
 
 server :: Server API
 server =
