@@ -11,13 +11,17 @@ This module contain the domain models
 module Domain (Book (..), parseBooks, encodeBooks, Operation (..), apply) where
 
 import Data.Bifunctor
+
+import Control.Monad.State (get)
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as B
 import Data.Csv
-import Data.Foldable (foldr, toList)
+import Data.Foldable (toList)
+import Data.Functor ((<&>))
 import qualified Data.Text as T
 import qualified Data.Vector as V
 import System.Random
+import System.Random.Shuffle
 import Prelude hiding (lookup)
 
 type Author = T.Text
@@ -60,16 +64,10 @@ encodeBooks = encodeByNameWith encodeOptions (V.fromList supportedField) . toLis
     encodeOptions = defaultEncodeOptions{encUseCrLf = False}
 
 -- Below, there is the business logic which could be moved away
-
-randomBook :: (RandomGen g) => g -> V.Vector Book -> (V.Vector Book, g)
-randomBook gen books = first selectPrepare random
-  where
-    random = uniformR (0, length books - 1) gen
-    selectPrepare = V.singleton . (V.!) books
+randomBooks :: RandomGen g => [Book] -> State g [Book]
+randomBooks books = get <&> shuffle' books (length books)
 
 -- TODO, this smells
-apply :: RandomGen g => g -> Operation -> V.Vector Book -> V.Vector Book
-apply gen Random books =
-    let (randomBookV, _gen) = randomBook gen books
-     in randomBookV
+apply :: RandomGen g => Operation -> g -> [Book] -> [Book]
+apply Random gen books = evalState (randomBooks books) gen
 apply _ _ books = books

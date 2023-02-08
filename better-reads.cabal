@@ -29,6 +29,7 @@ common common-options
                        , QuickCheck
                        , quickcheck-instances
                        , random
+                       , random-shuffle
                        , optparse-applicative
                        , fourmolu
                        , hlint
@@ -36,6 +37,7 @@ common common-options
                        , servant-server
                        , warp
                        , wai
+                       , mtl
   default-extensions:    OverloadedStrings
                        , RecordWildCards
   ghc-options:         -Wall
@@ -66,7 +68,7 @@ library
   hs-source-dirs:      src
   exposed-modules:       BetterReads
                        , Domain
-                       , Application
+                       , App
 
 executable better-reads-cli
   import:              common-options
