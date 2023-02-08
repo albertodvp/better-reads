@@ -1,3 +1,5 @@
+{-# LANGUAGE ViewPatterns #-}
+
 module Main (main) where
 
 import Data.ByteString.Lazy as BL
@@ -32,10 +34,10 @@ opts = info (params <**> helper) (fullDesc <> progDesc "Do something with you go
 
 main :: IO ()
 main = do
-    (inputFilePath, outputFilePath, operation) <- execParser opts
+    (inputFilePath, outputFilePath, op) <- execParser opts
     csvData <- BL.readFile inputFilePath
     randomGen <- initStdGen
     case parseBooks csvData of
         Left err -> putStrLn err
-        Right (_, books) ->
-            BL.writeFile outputFilePath $ encodeBooks (apply randomGen operation books)
+        Right (_, toList -> books) ->
+            BL.writeFile outputFilePath $ encodeBooks (apply op randomGen books)
