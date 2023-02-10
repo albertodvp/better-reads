@@ -18,7 +18,6 @@ nix-build
 
 ### Running tests
 ```bash
-nix-shell
 cabal test
 ```
 
