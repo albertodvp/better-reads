@@ -89,22 +89,19 @@ spec = do
         it "`List` operation returns the given list" $ do
             let
                 books =
-                    V.fromList
-                        [ Book "What We Owe the Future" "William MacAskill" "9781541618626"
-                        , Book "Data Mesh: Delivering Data-Driven Value at Scale" "Zhamak Dehghani" "9781492092391"
-                        ]
-                listOfBooks = apply stdGen List books
+                    [ Book "What We Owe the Future" "William MacAskill" "9781541618626"
+                    , Book "Data Mesh: Delivering Data-Driven Value at Scale" "Zhamak Dehghani" "9781492092391"
+                    ]
+                listOfBooks = apply List stdGen books
             listOfBooks `shouldBe` books
 
-        it "`Random` operation returns a list with one single book" $ do
+        it "`Random` operation on two books returns a list with two book" $ do
             let
                 randomBookV =
                     apply
-                        stdGen
                         Random
-                        ( V.fromList
-                            [ Book "What We Owe the Future" "William MacAskill" "9781541618626"
-                            , Book "Data Mesh: Delivering Data-Driven Value at Scale" "Zhamak Dehghani" "9781492092391"
-                            ]
-                        )
-            length randomBookV `shouldBe` 1
+                        stdGen
+                        [ Book "What We Owe the Future" "William MacAskill" "9781541618626"
+                        , Book "Data Mesh: Delivering Data-Driven Value at Scale" "Zhamak Dehghani" "9781492092391"
+                        ]
+            length randomBookV `shouldBe` 2

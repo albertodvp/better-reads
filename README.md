@@ -8,16 +8,22 @@ A toolkit to better handle goodread books
 - Random book pick
 - Shelves reorg
 
+### Setup
+Prepare a development environment.
 
-### Contributing
-#### Setup
-Prepare a development environment
 ```bash
-stack build
 pre-commit install
+nix-build
 ```
-#### Running tests
 
+### Running tests
 ```bash
-stack test
+nix-shell
+cabal test
+```
+
+### Running the cli application
+After a successful build, you can use the application from the command line:
+```bash
+result/bin/better-reads-cli test_data/goodreads_library_export.csv output_to_import.csv --random --limit 5
 ```
