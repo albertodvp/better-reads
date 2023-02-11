@@ -1,4 +1,4 @@
-cabal-version:       3.0
+cabal-version:       3.6
 name:                better-reads
 version:             0.0.0.0
 synopsis:            A toolkit to better handle goodread books
@@ -34,7 +34,11 @@ common common-options
                        , servant-server
                        , warp
                        , wai
+                       , wai-extra
                        , mtl
+                       , lucid
+                       , miso
+                       , http-types
   default-extensions:    OverloadedStrings
                        , RecordWildCards
   ghc-options:         -Wall
@@ -66,6 +70,7 @@ library
   exposed-modules:       BetterReads
                        , Domain
                        , App
+                       , Common
 
 executable better-reads-cli
   import:              common-options
@@ -78,12 +83,32 @@ executable better-reads-cli
 
 executable better-reads-web
   import:              common-options
+  if impl(ghcjs)
+    buildable: False
+  else
+    ghc-options:
+      -O2 -threaded -Wall -rtsopts
   hs-source-dirs:      app/web
   main-is:             Main.hs
   build-depends:       better-reads
   ghc-options:         -threaded
                        -rtsopts
                        -with-rtsopts=-N
+
+executable better-reads-client
+  import:              common-options
+  if impl(ghcjs)
+    buildable: False
+  else
+    ghcjs-options:
+      -dedupe -DGHCJS_GC_INTERVAL=5000
+  hs-source-dirs:      app/client
+  main-is:             Main.hs
+  build-depends:       better-reads
+  ghc-options:         -threaded
+                       -rtsopts
+                       -with-rtsopts=-N
+
 
 test-suite better-reads-test
   import:              common-options
