@@ -22,6 +22,7 @@ import qualified Data.Text as T
 import qualified Data.Vector as V
 import System.Random
 import System.Random.Shuffle
+import Prelude hiding (lookup)
 
 type Author = T.Text
 type ISBN = T.Text
