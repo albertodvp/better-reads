@@ -10,9 +10,7 @@ This module contain the domain models
 -}
 module Domain (Book (..), parseBooks, encodeBooks, Operation (..), apply) where
 
-import Data.Bifunctor
-
-import Control.Monad.State (get)
+import Control.Monad.State
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as B
 import Data.Csv
@@ -22,7 +20,7 @@ import qualified Data.Text as T
 import qualified Data.Vector as V
 import System.Random
 import System.Random.Shuffle
-import Prelude hiding (lookup)
+import Prelude hiding (State, evalState, lookup)
 
 type Author = T.Text
 type ISBN = T.Text

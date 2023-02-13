@@ -32,9 +32,13 @@ common common-options
                        , fourmolu
                        , servant
                        , servant-server
+                       , servant-lucid
                        , warp
                        , wai
+                       , wai-extra
                        , mtl
+                       , lucid
+                       , http-types
   default-extensions:    OverloadedStrings
                        , RecordWildCards
   ghc-options:         -Wall
