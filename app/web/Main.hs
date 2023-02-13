@@ -2,15 +2,11 @@ module Main (main) where
 
 import App (app)
 import Network.Wai.Handler.Warp (run)
+import Network.Wai.Middleware.RequestLogger (logStdout)
+import System.IO (hPutStrLn, stderr)
 
 main :: IO ()
-main = run 8081 app
-
---
-
--- main :: IO ()
--- main = do
---   let port = 3003
---   IO.hPutStrLn IO.stderr $ "Running on port " ++ show port
-
---   Wai.run
+main = do
+    let port = 3003
+    hPutStrLn stderr $ "Running on port " ++ show port
+    run port $ logStdout app
