@@ -1,0 +1,107 @@
+name: better-reads
+runtime: yaml
+description: BetterReads
+config:
+  instanceType:
+    type: string
+    default: t3.micro
+  vpcNetworkCidr:
+    type: string
+    default: 10.0.0.0/16
+# Export the instance's publicly accessible IP address and hostname.
+outputs:
+  hostname: ${server.publicDns}
+  ip: ${server.publicIp}
+  url: http://${server.publicDns}
+  ecr-url: ${repository.url}
+resources:
+  repository:
+    type: awsx:ecr:Repository
+  # Create an internet gateway.
+  gateway:
+    properties:
+      vpcId: ${vpc.id}
+    type: aws:ec2:InternetGateway
+  # Create a route table.
+  routeTable:
+    properties:
+      routes:
+        - cidrBlock: 0.0.0.0/0
+          gatewayId: ${gateway.id}
+      vpcId: ${vpc.id}
+    type: aws:ec2:RouteTable
+  # Associate the route table with the public subnet.
+  routeTableAssociation:
+    properties:
+      routeTableId: ${routeTable.id}
+      subnetId: ${subnet.id}
+    type: aws:ec2:RouteTableAssociation
+  # Create a security group allowing inbound access over port 80 and outbound
+  # access to anywhere.
+  secGroup:
+    properties:
+      description: Enable HTTP access
+      egress:
+        - cidrBlocks:
+            - 0.0.0.0/0
+          fromPort: 0
+          protocol: -1
+          toPort: 0
+      ingress:
+        - cidrBlocks:
+            - 0.0.0.0/0
+          fromPort: 80
+          protocol: tcp
+          toPort: 80
+      vpcId: ${vpc.id}
+    type: aws:ec2:SecurityGroup
+  # Create and launch an EC2 instance into the public subnet.
+  server:
+    properties:
+      ami: ${ami}
+      instanceType: ${instanceType}
+      subnetId: ${subnet.id}
+      tags:
+        Name: webserver
+      userData: ${userData}
+      vpcSecurityGroupIds:
+        - ${secGroup}
+    type: aws:ec2:Instance
+  # Create a subnet that automatically assigns new instances a public IP address.
+  subnet:
+    properties:
+      cidrBlock: 10.0.1.0/24
+      mapPublicIpOnLaunch: true
+      vpcId: ${vpc.id}
+    type: aws:ec2:Subnet
+  # Create VPC.
+  vpc:
+    properties:
+      cidrBlock: ${vpcNetworkCidr}
+      enableDnsHostnames: true
+      enableDnsSupport: true
+    type: aws:ec2:Vpc
+variables:
+  # Look up the latest Amazon Linux 2 AMI.
+  better-reads-image:
+    fn::invoke:
+      function: aws:ecr:getImage
+      arguments:
+        imageTag: better-reads
+        repositoryName: repository-0a0c9fb
+  ami:
+    fn::invoke:
+      arguments:
+        filters:
+          - name: name
+            values:
+              - "amzn2-ami-hvm-*"
+        mostRecent: true
+        owners:
+          - "amazon"
+      function: aws:ec2:getAmi
+      return: id
+  # User data to start a HTTP server in the EC2 instance
+  userData: |
+    #!/bin/bash
+    cabal run better-reads-web
