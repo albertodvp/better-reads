@@ -13,10 +13,9 @@ outputs:
   hostname: ${server.publicDns}
   ip: ${server.publicIp}
   url: http://${server.publicDns}
-  ecr-url: ${repository.url}
 resources:
   repository:
-    type: awsx:ecr:Repository
+    type: aws:ecr:Repository
   # Create an internet gateway.
   gateway:
     properties:
@@ -50,6 +49,11 @@ resources:
       ingress:
         - cidrBlocks:
             - 0.0.0.0/0
+          fromPort: 22
+          protocol: tcp
+          toPort: 22
+        - cidrBlocks:
+            - 0.0.0.0/0
           fromPort: 80
           protocol: tcp
           toPort: 80
@@ -60,7 +64,9 @@ resources:
     properties:
       ami: ${ami}
       instanceType: ${instanceType}
+      iamInstanceProfile: EC2profile
       subnetId: ${subnet.id}
+      keyName: albertodvp-pcp
       tags:
         Name: webserver
       userData: ${userData}
@@ -81,14 +87,45 @@ resources:
       enableDnsHostnames: true
       enableDnsSupport: true
     type: aws:ec2:Vpc
+  deployer:
+    type: aws:ec2:KeyPair
+    properties:
+      keyName: albertodvp-pcp
+      publicKey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC4vrlNWCUxBZnhs4BqyfoBco/Ct22paHGy13YykwYgFAHChPEiyJVqjtKHbXSuMOnD9YQZXk57qP94xUWImCwmgvstEZY/+489pFUoqXzfoHkfkYUEPo6Vp4peyzg1oiuQrYVin2rBZ9hJXX0udQfa4IL+d9w99gXjk0CecE/Gai4BKGBHYBd5Vx01tc1njA3UM2zc6FXmzCXtE/pW30anouFBOaj3KpKju9iVfTp2XAbx8pjuETxmiBx6ufX5O7VyHMR83J1FaEt9w74YEHsQLR67EN4bzpHuOjbQ8eZtWsWFBLiRDHRdeFdoC8fGCcZcld3RgrFHvStNY8YiGIHHzUwxUfBjK7YgSU379MddQoR3/3EBSbkVe43y4PFquePtrZ2IPyKx8jqnCAQt8kd8SywgG5cXMMGxSuOGHqPmDX51lHPi1CtudOlkWQA/FikOcpF1ZuHZCyzJIV4h7qKGJ4Lbu5Qp8pi65dQAaHkAlL12Zs/8lD+McTGVSdWKPyc= albertofanton@L-PA-PF3FV313
+  EC2profile:
+    type: aws:iam:InstanceProfile
+    properties:
+      name: EC2profile
+      role: EC2role
+  EC2role:
+    type: aws:iam:Role
+    properties:
+      name: EC2role
+      assumeRolePolicy:
+        fn::toJSON:
+          Version: 2012-10-17
+          Statement:
+            - Action: sts:AssumeRole
+              Effect: Allow
+              Principal:
+                Service: ec2.amazonaws.com
+      inlinePolicies:
+        - name: ECRro
+          policy:
+            fn::toJSON:
+              Version: 2012-10-17
+              Statement:
+                - Action:
+                    - ecr:GetDownloadUrlForLayer
+                    - ecr:BatchGetImage
+                    - ecr:DescribeImages
+                    - ecr:GetAuthorizationToken
+                    - ecr:ListImagese
+                  Effect: Allow
+                  Resource: '*'
+
 variables:
   # Look up the latest Amazon Linux 2 AMI.
-  better-reads-image:
-    fn::invoke:
-      function: aws:ecr:getImage
-      arguments:
-        imageTag: better-reads
-        repositoryName: repository-0a0c9fb
   ami:
     fn::invoke:
       arguments:
@@ -104,4 +141,9 @@ variables:
   # User data to start a HTTP server in the EC2 instance
   userData: |
     #!/bin/bash
-    cabal run better-reads-web
+    echo ""
+    sudo yum install -y docker
+    sudo systemctl start docker.service
+    aws ecr get-login-password --region eu-central-1 | sudo docker login --username AWS --password-stdin 193744010633.dkr.ecr.eu-central-1.amazonaws.com
+    sudo docker pull 193744010633.dkr.ecr.eu-central-1.amazonaws.com/repository-f83f280:better-reads
+    sudo docker run -it -p 80:80 193744010633.dkr.ecr.eu-central-1.amazonaws.com/repository-f83f280:better-reads
