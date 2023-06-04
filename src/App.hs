@@ -1,25 +1,30 @@
-{-# LANGUAGE DataKinds        #-}
+{-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeOperators    #-}
+{-# LANGUAGE TypeOperators #-}
 
 module App (app) where
 
-import           Control.Monad.IO.Class (liftIO)
-import qualified Data.ByteString.Lazy   as B
-import           Data.Foldable          (toList)
+import Control.Monad.IO.Class (liftIO)
+import qualified Data.ByteString.Lazy as B
+import Data.Foldable (toList)
 
-import           Data.String            (IsString (..), fromString)
-import qualified Data.Text              as T
-import           Domain                 (Book (..), Operation (..), apply,
-                                         encodeBooks, parseBooks)
-import qualified Lucid                  as L
+import Data.String (IsString (..), fromString)
+import qualified Data.Text as T
+import Domain (
+    Book (..),
+    Operation (..),
+    apply,
+    encodeBooks,
+    parseBooks,
+ )
+import qualified Lucid as L
 
-import qualified Network.HTTP.Types     as HTTP
-import qualified Network.Wai            as Wai
-import           Prelude                hiding (index)
-import           Servant
-import           Servant.HTML.Lucid     (HTML)
-import           System.Random
+import qualified Network.HTTP.Types as HTTP
+import qualified Network.Wai as Wai
+import Servant
+import Servant.HTML.Lucid (HTML)
+import System.Random
+import Prelude hiding (index)
 
 data PingMode = Loud | Normal
 
@@ -35,15 +40,15 @@ instance FromHttpApiData ParsedOperation where
     parseUrlPiece = f . capitalize
       where
         f "Random" = Right (ParsedOperation Random)
-        f "List"   = Right (ParsedOperation List)
-        f _        = Left paramErr
+        f "List" = Right (ParsedOperation List)
+        f _ = Left paramErr
 
 instance FromHttpApiData PingMode where
     parseQueryParam = f . capitalize
       where
-        f "Loud"   = Right Loud
+        f "Loud" = Right Loud
         f "Normal" = Right Normal
-        f _        = Left paramErr
+        f _ = Left paramErr
 
 -- TODO: what is happening here?
 --       - what is '[JSON] (DataKinds)
@@ -63,9 +68,9 @@ type API =
 handlerPingPong :: Maybe PingMode -> Handler String
 handlerPingPong mm =
     let res = case mm of
-            Just Loud   -> "PONG"
+            Just Loud -> "PONG"
             Just Normal -> "pong"
-            Nothing     -> "..."
+            Nothing -> "..."
      in pure res
 
 applyOperation :: Operation -> [Book] -> Handler [Book]

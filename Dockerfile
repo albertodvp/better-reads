@@ -1,8 +1,9 @@
-FROM haskell:9.2
+FROM fpco/stack-build:lts
+
 COPY . /app
 
 WORKDIR /app
 
-RUN cabal update && cabal build
+RUN stack build
 
-CMD ["cabal", "run", "better-reads-web"]
+CMD ["stack" "run" "--", "better-reads-web"]
