@@ -1,0 +1,5 @@
+config:
+  aws:profile: personal
+  aws:region: eu-central-1
+  better-reads:instanceType: t3.micro
+  better-reads:vpcNetworkCidr: 10.0.0.0/16
