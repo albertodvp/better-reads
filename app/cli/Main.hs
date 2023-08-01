@@ -3,8 +3,6 @@
 module Main (main) where
 
 import qualified Data.ByteString.Lazy as BL
-import Data.Foldable (traverse_)
-import Data.Semigroup ((<>))
 import Domain (
     Operation (..),
     apply,
