@@ -21,7 +21,7 @@ nix-shell
 
 ### Run tests
 ```bash
-nix-shell --command "cabal test"
+cabal test
 ```
 ### Run checks
 ```bash
@@ -35,26 +35,14 @@ fourmolu --mode check src test app
 fourmolu --mode inplace src test app
 ```
 
-### Build everything for dev purposes:
-This builds the lib and all the executables.
-```bash
-stack build --file-watch
-```
-
 ### Run the cli application
 After a successful build, you can use the application from the command line:
 ```bash
-stack run -- better-reads-cli --help
+cabal run better-reads-cli --help
 ```
 
 ### Run the web application
 The port will be set to `8123` by default, the environment variable `PORT` overrides the default port.
 ```bash
-PORT=8080 stack run -- better-reads-web
-```
-
-## Deployment
-### Local deployment
-TODO
-```bash
+PORT=8080 cabal run better-reads-web
 ```
