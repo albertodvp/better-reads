@@ -12,23 +12,27 @@ A toolkit to better handle goodread books.
 Prepare a development environment.
 ```bash
 pre-commit install
-stack build
+```
+Enter the development shell.
+NOTE: this is necessary for the following commands
+```bash
+nix-shell
 ```
 
 ### Run tests
 ```bash
-stack test
+nix-shell --command "cabal test"
 ```
 ### Run checks
 ```bash
 # hlint
-stack exec hlint -- src test app
+hlint src test app
 
 # fourmolu check
-stack exec fourmolu -- --mode check src test app
+fourmolu --mode check src test app
 
 # fourmolu format
-stack exec fourmolu -- --mode inplace src test app
+fourmolu --mode inplace src test app
 ```
 
 ### Build everything for dev purposes:
