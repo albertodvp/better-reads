@@ -13,12 +13,12 @@ repos:
   - id: hlint
     name: hlint
     description: HLint is a tool for suggesting possible improvements to Haskell code.
-    entry: nix-shell --command "hlint src test app"
+    entry: hlint src test app
     language: system
     files: '\.l?hs$'
   - id: fourmolu
     name: fourmolu
     description: Fourmolu is a formatter for Haskell source code
-    entry: nix-shell --command "fourmolu --mode check src test app"
+    entry: fourmolu --mode check src test app
     language: system
     files: '\.l?hs$'

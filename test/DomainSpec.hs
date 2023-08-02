@@ -1,12 +1,12 @@
+{-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
+
 module DomainSpec (spec) where
 
-import Test.Hspec
-import Test.Hspec.QuickCheck
-import Test.QuickCheck
-import Test.QuickCheck.Instances
+import Test.Hspec (Spec, describe, it, shouldBe)
+import Test.Hspec.QuickCheck (prop)
+import Test.QuickCheck (Arbitrary (arbitrary))
+import Test.QuickCheck.Instances ()
 
-import qualified Data.ByteString.Lazy as B
-import qualified Data.Text as T
 import qualified Data.Vector as V
 import Domain (
     Book (..),
@@ -15,7 +15,7 @@ import Domain (
     encodeBooks,
     parseBooks,
  )
-import System.Random
+import System.Random (StdGen, mkStdGen)
 
 -- TODO: how can I derive this automagically?
 instance Arbitrary Book where
