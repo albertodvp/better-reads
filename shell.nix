@@ -7,7 +7,6 @@ let
     hooks = {
       ormolu.enable = true;
       shellcheck.enable = true;
-      hlint.enable = true;
       cabal-fmt.enable = true;
     };
   };

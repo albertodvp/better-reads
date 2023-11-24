@@ -1,103 +1,105 @@
-cabal-version:       3.6
-name:                better-reads
-version:             0.0.1.0
-synopsis:            A toolkit to better handle goodread books
+cabal-version:   3.6
+name:            better-reads
+version:         0.0.1.0
+synopsis:        A toolkit to better handle goodread books
 description:
-    A toolkit to better handle goodread books.
-    See [README.md](https://github.com/albertodvp/better-reads#better-reads) for more details.
-homepage:            https://github.com/albertodvp/better-reads
-bug-reports:         https://github.com/albertodvp/better-reads/issues
-license:             MIT
-license-file:        LICENSE
-author:              Alberto Fanton
-maintainer:          Alberto Fanton <alberto.fanton@protonmail.com>
-copyright:           2023 Alberto Fanton
-build-type:          Simple
-extra-doc-files:     README.md
-                     CHANGELOG.md
+  A toolkit to better handle goodread books.
+  See [README.md](https://github.com/albertodvp/better-reads#better-reads) for more details.
+
+homepage:        https://github.com/albertodvp/better-reads
+bug-reports:     https://github.com/albertodvp/better-reads/issues
+license:         MIT
+license-file:    LICENSE
+author:          Alberto Fanton
+maintainer:      Alberto Fanton <alberto.fanton@protonmail.com>
+copyright:       2023 Alberto Fanton
+build-type:      Simple
+extra-doc-files:
+  CHANGELOG.md
+  README.md
 
 source-repository head
-  type:                git
-  location:            https://github.com/albertodvp/better-reads.git
+  type:     git
+  location: https://github.com/albertodvp/better-reads.git
 
 common common-options
-  build-depends:         base
-                       , relude
-                       , cassava
-                       , vector
-                       , random
-                       , random-shuffle
-                       , optparse-applicative
-                       , servant
-                       , servant-server
-                       , servant-lucid
-                       , warp
-                       , wai
-                       , wai-extra
-                       , mtl
-                       , lucid
-                       , http-types
-  default-extensions:    OverloadedStrings
-                       , RecordWildCards
-                       , NoImplicitPrelude
-  ghc-options:         -Wall
-                       -Wcompat
-                       -Widentities
-                       -Wincomplete-uni-patterns
-                       -Wincomplete-record-updates
-                       -Wredundant-constraints
-                       -Wnoncanonical-monad-instances
-  if impl(ghc >= 8.2)
-    ghc-options:       -fhide-source-paths
-  if impl(ghc >= 8.4)
-    ghc-options:       -Wmissing-export-lists
-                       -Wpartial-fields
-  if impl(ghc >= 8.8)
-    ghc-options:       -Wmissing-deriving-strategies
-                       -fwrite-ide-info
-                       -hiedir=.hie
-  if impl(ghc >= 8.10)
-    ghc-options:       -Wunused-packages
+  build-depends:
+    , base
+    , cassava
+    , http-types
+    , lucid
+    , mtl
+    , optparse-applicative
+    , random
+    , random-shuffle
+    , relude
+    , servant
+    , servant-lucid
+    , servant-server
+    , vector
+    , wai
+    , wai-extra
+    , warp
 
-  default-language:    GHC2021
-  mixins:                base hiding (Prelude)
-                       , relude (Relude as Prelude)
-                       , relude
+  default-extensions:
+    OverloadedStrings
+    RecordWildCards
+
+  ghc-options:
+    -Wall -Wcompat -Widentities -Wincomplete-uni-patterns
+    -Wincomplete-record-updates -Wredundant-constraints
+    -Wnoncanonical-monad-instances
+
+  if impl(ghc >=8.2)
+    ghc-options: -fhide-source-paths
+
+  if impl(ghc >=8.4)
+    ghc-options: -Wmissing-export-lists -Wpartial-fields
+
+  if impl(ghc >=8.8)
+    ghc-options: -Wmissing-deriving-strategies -fwrite-ide-info -hiedir=.hie
+
+  if impl(ghc >=8.10)
+    ghc-options: -Wunused-packages
+
+  default-language:   GHC2021
+  mixins:
+    base hiding (Prelude),
+    relude (Relude as Prelude),
+    relude
+
 library
-  import:              common-options
-  hs-source-dirs:      src
-  exposed-modules:       BetterReads
-                       , Domain
-                       , App
+  import:          common-options
+  hs-source-dirs:  src
+  exposed-modules:
+    App
+    BetterReads
+    Domain
 
 executable better-reads-cli
-  import:              common-options
-  hs-source-dirs:      app/cli
-  main-is:             Main.hs
-  build-depends:       better-reads
-  ghc-options:         -threaded
-                       -rtsopts
-                       -with-rtsopts=-N
+  import:         common-options
+  hs-source-dirs: app/cli
+  main-is:        Main.hs
+  build-depends:  better-reads
+  ghc-options:    -threaded -rtsopts -with-rtsopts=-N
 
 executable better-reads-web
-  import:              common-options
-  hs-source-dirs:      app/web
-  main-is:             Main.hs
-  build-depends:       better-reads
-  ghc-options:         -threaded
-                       -rtsopts
-                       -with-rtsopts=-N
+  import:         common-options
+  hs-source-dirs: app/web
+  main-is:        Main.hs
+  build-depends:  better-reads
+  ghc-options:    -threaded -rtsopts -with-rtsopts=-N
 
 test-suite better-reads-test
-  import:              common-options
-  type:                exitcode-stdio-1.0
-  hs-source-dirs:      test
-  main-is:             Spec.hs
-  other-modules:       DomainSpec
-  build-depends:         better-reads
-                       , hspec
-                       , QuickCheck
-                       , quickcheck-instances
-  ghc-options:         -threaded
-                       -rtsopts
-                       -with-rtsopts=-N
+  import:         common-options
+  type:           exitcode-stdio-1.0
+  hs-source-dirs: test
+  main-is:        Spec.hs
+  other-modules:  DomainSpec
+  build-depends:
+    , better-reads
+    , hspec
+    , QuickCheck
+    , quickcheck-instances
+
+  ghc-options:    -threaded -rtsopts -with-rtsopts=-N

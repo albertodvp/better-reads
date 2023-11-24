@@ -27,14 +27,21 @@ ormolu --mode check $(find . -name '*.hs')
 ormolu --mode inplace $(find . -name '*.hs')
 ```
 
+## Run the applications
+Build the application binaries
+```bash
+nix-build
+```
+
+
 ### Run the cli application
 After a successful build, you can use the application from the command line:
 ```bash
-cabal run better-reads-cli --help
+result/bin/better-reads-cli --help
 ```
 
 ### Run the web application
 The port will be set to `8123` by default, the environment variable `PORT` overrides the default port.
 ```bash
-PORT=8080 cabal run better-reads-web
+PORT=8080 result/bin/better-reads-web --help
 ```

@@ -64,7 +64,7 @@ encodeBooks = encodeByNameWith encodeOptions (V.fromList supportedField) . toLis
 
 -- Below, there is the business logic which could be moved away
 randomBooks :: (RandomGen g) => [Book] -> State g [Book]
-randomBooks books = get <&> shuffle' books (length books)
+randomBooks books = gets (shuffle' books (length books))
 
 -- TODO, this smells
 apply :: (RandomGen g) => Operation -> g -> [Book] -> [Book]
