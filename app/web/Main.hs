@@ -8,6 +8,6 @@ import System.IO (hPutStrLn, stderr)
 
 main :: IO ()
 main = do
-    port <- fromMaybe 8080 . (>>= readMaybe) <$> lookupEnv "PORT"
-    hPutStrLn stderr $ "Running on port: " ++ show port
-    run port $ logStdout app
+  port <- fromMaybe 8080 . (>>= readMaybe) <$> lookupEnv "PORT"
+  hPutStrLn stderr $ "Running on port: " ++ show port
+  run port $ logStdout app

@@ -1,6 +1,6 @@
-cabal-version:       3.0
+cabal-version:       3.6
 name:                better-reads
-version:             0.0.0.0
+version:             0.0.1.0
 synopsis:            A toolkit to better handle goodread books
 description:
     A toolkit to better handle goodread books.
@@ -21,15 +21,13 @@ source-repository head
   location:            https://github.com/albertodvp/better-reads.git
 
 common common-options
-  build-depends:         base < 5
-                       , relude ^>= 1.1.0.0
-                       , cassava ^>= 0.5.3.0
-                       , vector ^>= 0.12.3.1
+  build-depends:         base
+                       , relude
+                       , cassava
+                       , vector
                        , random
                        , random-shuffle
                        , optparse-applicative
-                       , hlint
-                       , fourmolu
                        , servant
                        , servant-server
                        , servant-lucid
@@ -41,6 +39,7 @@ common common-options
                        , http-types
   default-extensions:    OverloadedStrings
                        , RecordWildCards
+                       , NoImplicitPrelude
   ghc-options:         -Wall
                        -Wcompat
                        -Widentities
@@ -60,7 +59,7 @@ common common-options
   if impl(ghc >= 8.10)
     ghc-options:       -Wunused-packages
 
-  default-language:    Haskell2010
+  default-language:    GHC2021
   mixins:                base hiding (Prelude)
                        , relude (Relude as Prelude)
                        , relude
@@ -96,7 +95,7 @@ test-suite better-reads-test
   main-is:             Spec.hs
   other-modules:       DomainSpec
   build-depends:         better-reads
-                       , hspec  ^>= 2.9.7
+                       , hspec
                        , QuickCheck
                        , quickcheck-instances
   ghc-options:         -threaded

@@ -1,2 +1,4 @@
-{ nixpkgs ? import <nixpkgs> {}, compiler ? "ghc928" }:
-nixpkgs.pkgs.haskell.packages.${compiler}.callPackage ./better-reads.nix { }
+{ pkgs ? import <nixpkgs> { }, compiler ? "ghc963" }:
+{
+  betterReads = pkgs.haskell.packages.${compiler}.callPackage ./better-reads.nix { };
+}

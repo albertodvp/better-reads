@@ -9,15 +9,7 @@ A toolkit to better handle goodread books.
 - Shelves reorg
 
 ## Development
-Prepare a development environment.
-```bash
-pre-commit install
-```
-Enter the development shell.
-NOTE: this is necessary for the following commands
-```bash
-nix-shell
-```
+I suggest using [direnv](https://direnv.net/), this would work with nix seamlessly.
 
 ### Run tests
 ```bash
@@ -29,10 +21,10 @@ cabal test
 hlint src test app
 
 # fourmolu check
-fourmolu --mode check src test app
+ormolu --mode check $(find . -name '*.hs')
 
 # fourmolu format
-fourmolu --mode inplace src test app
+ormolu --mode inplace $(find . -name '*.hs')
 ```
 
 ### Run the cli application

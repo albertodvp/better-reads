@@ -1,6 +1,5 @@
 replicaCount: 1
 
-
 resources:
   limits:
     cpu: 100m
