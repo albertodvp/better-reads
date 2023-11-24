@@ -7,6 +7,8 @@ let
     hooks = {
       ormolu.enable = true;
       shellcheck.enable = true;
+      hlint.enable = true;
+      cabal-fmt.enable = true;
     };
   };
 in
@@ -18,10 +20,7 @@ pkgs.haskellPackages.shellFor {
     pkgs.cabal2nix
     pkgs.zlib
     pkgs.haskellPackages.haskell-language-server
-    pkgs.haskellPackages.hlint
     pkgs.haskellPackages.hasktags
-    pkgs.haskellPackages.ormolu
-    pkgs.haskellPackages.implicit-hie
   ];
 }
 
