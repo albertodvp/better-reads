@@ -57,3 +57,4 @@ test_data
 report.html
 out
 result
+/.pre-commit-config.yaml
