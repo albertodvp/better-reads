@@ -1,8 +1,8 @@
-{ pkgs ? import <nixpkgs> { }, compiler ? "ghc963" }:
+{ pkgs ? import <nixpkgs> { }, compiler ? "ghc946" }:
 let
   betterReads = (import ./default.nix { inherit pkgs; inherit compiler; }).betterReads;
-  nix-pre-commit-hooks = import (builtins.fetchTarball "https://github.com/cachix/pre-commit-hooks.nix/tarball/master");
-  pre-commit-check = nix-pre-commit-hooks.run {
+  nixPreCommitHooks = import (builtins.fetchTarball "https://github.com/cachix/pre-commit-hooks.nix/tarball/master");
+  preCommitCheck = nixPreCommitHooks.run {
     src = ./.;
     hooks = {
       ormolu.enable = true;
@@ -12,7 +12,7 @@ let
   };
 in
 pkgs.haskellPackages.shellFor {
-  shellHook = pre-commit-check.shellHook;
+  shellHook = preCommitCheck.shellHook;
   packages = hpkgs: [ betterReads ];
   nativeBuildInputs = [
     pkgs.cabal-install
@@ -20,6 +20,7 @@ pkgs.haskellPackages.shellFor {
     pkgs.zlib
     pkgs.haskellPackages.haskell-language-server
     pkgs.haskellPackages.hasktags
+    pkgs.haskellPackages.implicit-hie
   ];
 }
 

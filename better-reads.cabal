@@ -29,12 +29,14 @@ common common-options
     , http-types
     , lucid
     , mtl
+    , openapi3
     , optparse-applicative
     , random
     , random-shuffle
     , relude
     , servant
     , servant-lucid
+    , servant-openapi3
     , servant-server
     , vector
     , wai

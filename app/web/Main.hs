@@ -1,10 +1,9 @@
 module Main (main) where
 
 import App (app)
-import Data.Maybe (fromMaybe)
 import Network.Wai.Handler.Warp (run)
 import Network.Wai.Middleware.RequestLogger (logStdout)
-import System.IO (hPutStrLn, stderr)
+import System.IO (hPutStrLn)
 
 main :: IO ()
 main = do

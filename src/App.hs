@@ -1,13 +1,13 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE TypeOperators #-}
 
 module App (app) where
 
-import Control.Monad.IO.Class (liftIO)
 import Data.ByteString.Lazy qualified as B
-import Data.Foldable (toList)
-import Data.String (IsString (..), fromString)
+import Data.OpenApi (NamedSchema (NamedSchema), OpenApi, ToParamSchema, ToSchema (declareNamedSchema))
+import Data.Proxy (Proxy)
 import Data.Text qualified as T
 import Domain
   ( Book (..),
@@ -16,13 +16,15 @@ import Domain
     encodeBooks,
     parseBooks,
   )
+import GHC.Generics (Generic)
 import Lucid qualified as L
 import Network.HTTP.Types qualified as HTTP
 import Network.Wai qualified as Wai
 import Servant
+import Servant.API (JSON)
 import Servant.HTML.Lucid (HTML)
+import Servant.OpenApi
 import System.Random
-import Prelude hiding (index)
 
 data PingMode = Loud | Normal
 
@@ -32,7 +34,9 @@ capitalize = T.toTitle . T.toLower
 paramErr :: T.Text
 paramErr = "Invalid param"
 
-newtype ParsedOperation = ParsedOperation Operation
+newtype ParsedOperation = ParsedOperation Operation deriving (Generic)
+
+instance ToParamSchema ParsedOperation
 
 instance FromHttpApiData ParsedOperation where
   parseUrlPiece = f . capitalize
@@ -48,41 +52,46 @@ instance FromHttpApiData PingMode where
       f "Normal" = Right Normal
       f _ = Left paramErr
 
--- TODO: what is happening here?
---       - what is '[JSON] (DataKinds)
---       - does (:<|>), (:>) work (TypeOperators)
-type StaticAPI = "static" :> Raw
-
 type RootGetAPI = Get '[HTML] (L.Html ())
 
-type RootPostAPI = Post '[HTML] String
+newtype BooksFile = BooksFile B.ByteString deriving (Generic)
+
+instance ToSchema BooksFile where
+  declareNamedSchema _ = return $ NamedSchema (Just "File with books") $ mempty
+
+instance MimeRender OctetStream BooksFile where
+  mimeRender _ (BooksFile bs) = bs
+
+instance MimeUnrender OctetStream BooksFile where
+  mimeUnrender _ = Right . BooksFile
 
 type API =
+  "api"
+    :> ( "healthcheck" :> Get '[PlainText] String
+           :<|> "booksOperation" :> Capture "operation" ParsedOperation :> QueryParam "limit" Int :> ReqBody '[OctetStream] BooksFile :> Post '[OctetStream] BooksFile
+       )
+
+type SwaggerAPI = "swagger.json" :> Get '[JSON] OpenApi
+
+type StaticAPI = "static" :> Raw
+
+type App =
   RootGetAPI
     :<|> StaticAPI
-    :<|> "ping" :> QueryParam "mode" PingMode :> Get '[JSON] String
-    -- TODO: implement this by yourself
-    :<|> "booksOperation" :> Capture "operation" ParsedOperation :> QueryParam "limit" Int :> ReqBody '[OctetStream] B.ByteString :> Post '[OctetStream] B.ByteString
+    :<|> API
+    :<|> SwaggerAPI
     :<|> Raw
-
-handlerPingPong :: Maybe PingMode -> Handler String
-handlerPingPong mm =
-  let res = case mm of
-        Just Loud -> "PONG"
-        Just Normal -> "pong"
-        Nothing -> "..."
-   in pure res
 
 applyOperation :: Operation -> [Book] -> Handler [Book]
 applyOperation op books = do
   gen <- liftIO initStdGen
   pure $ apply op gen books
 
-booksOperationHandler :: ParsedOperation -> Maybe Int -> B.ByteString -> Handler B.ByteString
-booksOperationHandler pOp Nothing booksBS = booksOperationHandler pOp (Just 1) booksBS
-booksOperationHandler (ParsedOperation op) (Just n) booksBS = case parseBooks booksBS of
+booksOperationHandler :: ParsedOperation -> Maybe Int -> BooksFile -> Handler BooksFile
+booksOperationHandler pOp Nothing booksFile = booksOperationHandler pOp (Just 1) booksFile
+booksOperationHandler (ParsedOperation op) (Just n) (BooksFile booksBS) = case parseBooks booksBS of
   Left _ -> throwError $ err400 {errBody = "Bad request :("}
-  Right (_, books) -> encodeBooks . take n <$> applyOperation op (toList books)
+  Right (_, books) -> BooksFile . encodeBooks . take n <$> applyOperation op (toList books)
 
 page404App :: Wai.Application
 page404App _ respond =
@@ -92,12 +101,20 @@ page404App _ respond =
       [("Content-Type", "text/html")]
     $ L.renderBS page404
 
-server :: Server API
+api :: Proxy API
+api = Proxy
+
+swagger :: OpenApi
+swagger = toOpenApi api
+
+server :: Server App
 server =
   return pageIndex
     :<|> staticServer
-    :<|> handlerPingPong
-    :<|> booksOperationHandler
+    :<|> ( return "ok"
+             :<|> booksOperationHandler
+         )
+    :<|> return swagger
     -- TODO what is servant.tagged
     :<|> Servant.Tagged page404App
 
@@ -105,7 +122,7 @@ staticServer :: Server StaticAPI
 staticServer = Servant.serveDirectoryFileServer "static"
 
 app :: Wai.Application
-app = serve (Proxy @API) server
+app = serve (Proxy @App) server
 
 -- Pagees
 mkPage :: (Monad m) => L.HtmlT m b -> L.HtmlT m b

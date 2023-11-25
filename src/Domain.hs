@@ -15,6 +15,7 @@ import Data.ByteString.Lazy qualified as B
 import Data.Csv
 import Data.Foldable (toList)
 import Data.Functor ((<&>))
+import Data.OpenApi (NamedSchema (NamedSchema), OpenApi, ToParamSchema, ToSchema (declareNamedSchema))
 import Data.Text qualified as T
 import Data.Vector qualified as V
 import System.Random
@@ -52,7 +53,9 @@ instance ToNamedRecord Book where
         "ISBN13" .= isbn13
       ]
 
-data Operation = Random | List deriving stock (Show, Read)
+data Operation = Random | List deriving stock (Show, Read, Generic)
+
+instance ToParamSchema Operation
 
 parseBooks :: B.ByteString -> Either String (Header, V.Vector Book)
 parseBooks = decodeByName
