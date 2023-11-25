@@ -1,20 +1,44 @@
+{-
+Maps types used in the web layer with types in the domain.
+This mode does not expose any functionalities (exluded classes instancess).
+
+-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingStrategies #-}
 
-module AppTypes where
+module AppTypes (BooksFile (BooksFile), SortMode (SortMode), Limit) where
 
 import Data.ByteString.Lazy qualified as B
 import Data.OpenApi
   ( NamedSchema (NamedSchema),
+    ToParamSchema,
     ToSchema (declareNamedSchema),
   )
+import Data.Text qualified as T
+import Internal.Domain (Sort (..))
 import Servant
-  ( MimeRender (mimeRender),
+  ( FromHttpApiData (parseQueryParam),
+    MimeRender (mimeRender),
     MimeUnrender (mimeUnrender),
     OctetStream,
   )
 
-newtype BooksFile = BooksFile B.ByteString deriving stock (Generic)
+newtype BooksFile = BooksFile B.ByteString deriving stock (Generic, Show)
+
+type Limit = Int
+
+newtype SortMode where
+  SortMode :: Sort -> SortMode
+  deriving stock (Generic)
+
+instance ToParamSchema SortMode
+
+instance FromHttpApiData SortMode where
+  parseQueryParam sortMode = case T.toTitle sortMode of
+    "Random" -> Right $ SortMode Random
+    "MostRecent" -> Right $ SortMode MostRecent
+    "Alphabetical" -> Right $ SortMode Alphabetical
+    _ -> Left "Unknown sort mode"
 
 -- TODO
 instance ToSchema BooksFile where

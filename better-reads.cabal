@@ -77,7 +77,9 @@ library
     App
     AppTypes
     BetterReads
-    Domain
+    Errors
+    Internal.Domain
+    Service
     Static
 
 executable better-reads-cli
@@ -97,13 +99,14 @@ executable better-reads-web
 test-suite better-reads-test
   import:         common-options
   type:           exitcode-stdio-1.0
-  hs-source-dirs: test
-  main-is:        Spec.hs
-  other-modules:  DomainSpec
+  hs-source-dirs: test/Spec
+  main-is:        Main.hs
+  other-modules:
+    Internal.SanitizeSpec
+    ServiceSpec
+
   build-depends:
     , better-reads
     , hspec
-    , QuickCheck
-    , quickcheck-instances
 
   ghc-options:    -threaded -rtsopts -with-rtsopts=-N

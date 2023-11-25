@@ -58,3 +58,4 @@ report.html
 out
 result
 /.pre-commit-config.yaml
+data

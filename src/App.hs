@@ -4,14 +4,14 @@
 
 module App (app) where
 
-import AppTypes (BooksFile)
+import AppTypes (BooksFile (BooksFile), Limit, SortMode)
 import Data.OpenApi (OpenApi)
-import Domain (SortMode)
 import Lucid qualified as L
 import Network.Wai qualified as Wai
 import Servant
 import Servant.HTML.Lucid (HTML)
 import Servant.OpenApi
+import Service qualified
 import Static (page404App, pageIndex)
 
 {-
@@ -24,7 +24,7 @@ type RootGetAPI = Get '[HTML] (L.Html ())
 type API =
   "api"
     :> ( "healthcheck" :> Get '[PlainText] String
-           :<|> "sort" :> QueryParam' '[Required] "sort-mode" SortMode :> QueryParam "limit" Int :> ReqBody '[OctetStream] BooksFile :> Post '[OctetStream] BooksFile
+           :<|> "sort" :> QueryParam' '[Required] "sort-mode" SortMode :> QueryParam "limit" Limit :> ReqBody '[OctetStream] BooksFile :> Post '[OctetStream] BooksFile
        )
 
 type SwaggerAPI = "swagger.json" :> Get '[JSON] OpenApi
@@ -41,9 +41,11 @@ type App =
 API Handers
 
 -}
-sortHandler :: SortMode -> Maybe Int -> BooksFile -> Handler BooksFile
+sortHandler :: SortMode -> Maybe Limit -> BooksFile -> Handler BooksFile
 sortHandler sortMode Nothing booksFile = sortHandler sortMode (Just 1) booksFile
-sortHandler sortMode (Just limit) booksFile = undefined
+sortHandler sortMode (Just limit) booksFile = case Service.sort sortMode limit booksFile of
+  Left err -> undefined
+  Right booksFile -> pure booksFile
 
 server :: Server App
 server =
