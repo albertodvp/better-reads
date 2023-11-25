@@ -1,0 +1,13 @@
+cradle:
+  cabal:
+    - path: "src"
+      component: "lib:better-reads"
+
+    - path: "app/cli/Main.hs"
+      component: "better-reads:exe:better-reads-cli"
+
+    - path: "app/web/Main.hs"
+      component: "better-reads:exe:better-reads-web"
+
+    - path: "test"
+      component: "better-reads:test:better-reads-test"

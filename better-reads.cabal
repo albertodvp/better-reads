@@ -75,8 +75,10 @@ library
   hs-source-dirs:  src
   exposed-modules:
     App
+    AppTypes
     BetterReads
     Domain
+    Static
 
 executable better-reads-cli
   import:         common-options

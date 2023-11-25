@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingStrategies #-}
 {-# LANGUAGE RecordWildCards #-}
 
@@ -7,20 +8,49 @@
 -- Maintainer: Alberto Fanton <alberto.fanton@protonmail.com>
 --
 -- This module contain the domain models
-module Domain (Book (..), parseBooks, encodeBooks, Operation (..), apply) where
+module Domain (SortMode) where
 
-import Control.Monad.State
 import Data.ByteString qualified as BS
 import Data.ByteString.Lazy qualified as B
 import Data.Csv
-import Data.Foldable (toList)
-import Data.Functor ((<&>))
-import Data.OpenApi (NamedSchema (NamedSchema), OpenApi, ToParamSchema, ToSchema (declareNamedSchema))
+  ( EncodeOptions (encUseCrLf),
+    FromNamedRecord (..),
+    Header,
+    ToNamedRecord (..),
+    decodeByName,
+    defaultEncodeOptions,
+    encodeByNameWith,
+    namedRecord,
+    (.:),
+    (.=),
+  )
+import Data.OpenApi (ToParamSchema)
 import Data.Text qualified as T
 import Data.Vector qualified as V
-import System.Random
-import System.Random.Shuffle
-import Prelude hiding (State, evalState, lookup)
+import Servant (FromHttpApiData (parseQueryParam))
+import System.Random (RandomGen)
+import System.Random.Shuffle (shuffle')
+
+data Sort where
+  Random :: Sort
+  MostRecent :: Sort
+  Alphabetical :: Sort
+  deriving stock (Generic)
+
+newtype SortMode where
+  SortMode :: Sort -> SortMode
+  deriving stock (Generic)
+
+instance ToParamSchema Sort
+
+instance ToParamSchema SortMode
+
+instance FromHttpApiData SortMode where
+  parseQueryParam sortMode = case T.toTitle sortMode of
+    "Random" -> Right $ SortMode Random
+    "MostRecent" -> Right $ SortMode MostRecent
+    "Alphabetical" -> Right $ SortMode Alphabetical
+    _ -> Left "Unknown sort mode"
 
 type Author = T.Text
 
@@ -36,7 +66,7 @@ data Book = Book
     author :: Author, -- the author of the book
     isbn13 :: ISBN -- 13 digit book identifier that is intended to be unique
   }
-  deriving stock (Show, Eq)
+  deriving (Show, Eq)
 
 instance FromNamedRecord Book where
   parseNamedRecord r = do
@@ -53,10 +83,6 @@ instance ToNamedRecord Book where
         "ISBN13" .= isbn13
       ]
 
-data Operation = Random | List deriving stock (Show, Read, Generic)
-
-instance ToParamSchema Operation
-
 parseBooks :: B.ByteString -> Either String (Header, V.Vector Book)
 parseBooks = decodeByName
 
@@ -70,6 +96,6 @@ randomBooks :: (RandomGen g) => [Book] -> State g [Book]
 randomBooks books = gets (shuffle' books (length books))
 
 -- TODO, this smells
-apply :: (RandomGen g) => Operation -> g -> [Book] -> [Book]
-apply Random gen books = evalState (randomBooks books) gen
-apply _ _ books = books
+-- apply :: (RandomGen g) => Operation -> g -> [Book] -> [Book]
+-- apply Random gen books = evalState (randomBooks books) gen
+-- apply _ _ books = books
