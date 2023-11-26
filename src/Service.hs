@@ -1,6 +1,6 @@
 module Service (sort, parseBooks, encodeBooks) where
 
-import AppTypes (BooksFile (BooksFile), Limit, SortMode)
+import AppTypes (BooksFile (BooksFile), EitherBR, Limit, SortMode)
 import Data.Csv
   ( EncodeOptions (encUseCrLf),
     decodeByName,
@@ -12,8 +12,6 @@ import Data.Vector qualified as V
 import Errors qualified as E
 import Internal.Domain (Book, supportedBookFields)
 import Prelude hiding (sort)
-
-type EitherBR = Either E.Error
 
 sort :: SortMode -> Limit -> BooksFile -> EitherBR BooksFile
 sort sortMode limit booksFile = do

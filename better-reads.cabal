@@ -25,6 +25,7 @@ source-repository head
 common common-options
   build-depends:
     , base
+    , bytestring
     , cassava
     , http-types
     , lucid
@@ -38,6 +39,7 @@ common common-options
     , servant-lucid
     , servant-openapi3
     , servant-server
+    , time
     , vector
     , wai
     , wai-extra
@@ -101,12 +103,10 @@ test-suite better-reads-test
   type:           exitcode-stdio-1.0
   hs-source-dirs: test/Spec
   main-is:        Main.hs
-  other-modules:
-    Internal.SanitizeSpec
-    ServiceSpec
-
+  other-modules:  ServiceSpec
   build-depends:
     , better-reads
     , hspec
+    , time
 
   ghc-options:    -threaded -rtsopts -with-rtsopts=-N

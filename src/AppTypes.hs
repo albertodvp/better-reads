@@ -6,7 +6,7 @@ This mode does not expose any functionalities (exluded classes instancess).
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DerivingStrategies #-}
 
-module AppTypes (BooksFile (BooksFile), SortMode (SortMode), Limit) where
+module AppTypes (BooksFile (BooksFile), SortMode (SortMode), Limit, EitherBR, E.Error (..)) where
 
 import Data.ByteString.Lazy qualified as B
 import Data.OpenApi
@@ -15,6 +15,7 @@ import Data.OpenApi
     ToSchema (declareNamedSchema),
   )
 import Data.Text qualified as T
+import Errors qualified as E
 import Internal.Domain (Sort (..))
 import Servant
   ( FromHttpApiData (parseQueryParam),
@@ -22,6 +23,8 @@ import Servant
     MimeUnrender (mimeUnrender),
     OctetStream,
   )
+
+type EitherBR = Either E.Error
 
 newtype BooksFile = BooksFile B.ByteString deriving stock (Generic, Show)
 

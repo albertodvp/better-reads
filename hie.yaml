@@ -9,5 +9,5 @@ cradle:
     - path: "app/web/Main.hs"
       component: "better-reads:exe:better-reads-web"
 
-    - path: "test"
+    - path: "test/Spec"
       component: "better-reads:test:better-reads-test"
